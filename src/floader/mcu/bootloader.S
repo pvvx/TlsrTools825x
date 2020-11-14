@@ -4,22 +4,14 @@
 #define USE_ICACHE			0
 #define USE_SETSPISPEED		0
 #define USE_FLL_D			0
+#define USE_DATA_I			0
 
 	.code	16
 @********************************************************************************************************
 @                                           MACROS AND DEFINIITIONS
 @********************************************************************************************************
-@.include "version.in"
 
-					@ Mode, correspords to bits 0-5 in CPSR
-	.equ MODE_BITS,		0x1F	@ Bit mask for mode bits in CPSR
-	.equ IRQ_MODE, 		0x12	@ Interrupt Request mode
-	.equ SVC_MODE, 		0x13	@ Supervisor mode 
-#if USE_IRQ
 	.equ IRQ_STK_SIZE,	0x180
-#else
-	.equ IRQ_STK_SIZE,	0
-#endif
 	.equ __RAM_START_ADDR, 	0x00840000
 	.equ __RAM_SIZE_MAX, 	(32*1024)
 	
@@ -36,10 +28,8 @@
 
 __start:					@ MUST,  referenced by boot.link
 
-@	.extern  _ramcode_size_div_16_
-@@	.extern  _ramcode_size_div_256_
-	.extern  _ramcode_size_div_16_align_256_
-@@	.extern  _ramcode_size_align_256_
+	.extern  _ramcode_size_div_16_
+	.extern  _ramcode_size_div_256_
 	.extern  _ictag_start_
 	.extern  _ictag_end_
 
@@ -50,7 +40,7 @@ __start:					@ MUST,  referenced by boot.link
 	.org 0x4
 	.word	(ext)	@ user code
 	.word	(0x544c4e4b)	@ ID
-	.word	(0x00880000 + _ramcode_size_div_16_align_256_)	@must align 256, because of ic tag is 256 aligned
+	.word	(0x00880000 + _ramcode_size_div_16_)
 
 	.org 0x10
 #if USE_IRQ
@@ -107,12 +97,12 @@ FLL_STK_END:
 @********************************************************************************************************
 	tmovs   r0,#0x12					@r0 = 0x12 IRQ
 	tmcsr	r0							@CPSR=r0
-	tloadr	r0, DAT0 + 0				@r0 = irq_stk + IRQ_STK_SIZE
+	tloadr	r0, DAT0 + 0				@r0 = __RAM_START_ADDR + __RAM_SIZE_MAX
 	tmov	r13, r0  					@r13/SP= r0    	update SP under IRQ mode
 
 	tmovs   r0,#0x13					@r0 = 0x13 SVC
 	tmcsr	r0							@CPSR=r0
-	tloadr	r0, DAT0 + 4				@r0 = __RAM_START_ADDR + __RAM_SIZE_MAX
+	tloadr	r0, DAT0 + 4				@r0 = __RAM_START_ADDR + __RAM_SIZE_MAX - IRQ_STK_SIZE
 	tmov	r13, r0  					@r13= r0		update SP under SVC mode
 
 @********************************************************************************************************
@@ -161,6 +151,7 @@ SETIC:
 @********************************************************************************************************
 @                                    DATA SECTION LOAD
 @********************************************************************************************************
+#if USE_DATA_I
 	tloadr		r1, DATA_I				@ r1 = _dstored_
 	tloadr		r2, DATA_I+4			@ r2 = _start_data_
 	tloadr		r3, DATA_I+8			@ r3 = _end_data_
@@ -173,7 +164,7 @@ COPY_DATA:
 	tadd		r2, #4					@ r2 = r2 + 4
 	tj			COPY_DATA				@ jump to COPY_DATA
 COPY_DATA_END:
-
+#endif
 #if USE_SETSPISPEED
 SETSPISPEED:
 	tloadr     	r1, DAT0 + ?
@@ -222,26 +213,22 @@ __irq:
 @********************************************************************************************************
 	.balign	4
 DAT0:
-#if USE_IRQ
-	.word	(irq_stk + IRQ_STK_SIZE)	@0
-#else
-	.word	(ASMEND)		    		@0  irq stack 
-#endif
-	.word	(__RAM_START_ADDR + __RAM_SIZE_MAX)		    @4  stack end
+	.word	(__RAM_START_ADDR + __RAM_SIZE_MAX)		    @0  irq stack end
+	.word	(__RAM_START_ADDR + __RAM_SIZE_MAX - IRQ_STK_SIZE)	    @4  stack end
 	.word	(_start_bss_)               @8
 	.word	(_end_bss_)                 @12
-	.word	_ramcode_size_div_256_      @16
 #if USE_ICACHE
+	.word	_ramcode_size_div_256_      @16
 	.word	(0x80060c)                  @20
 	.word	_ictag_start_               @24		@ IC tag start
 	.word	_ictag_end_	            	@28		@ IC tag end
 #endif
-
+#if USE_DATA_I
 DATA_I:	
 	.word	(_dstored_)					@0
 	.word	(_start_data_)				@4
 	.word	(_end_data_)				@8
-
+#endif
 #if USE_FLASH_WAKEUP
 FLASH_RECOVER:
 	.word	(0x80000c)                  @0
@@ -254,10 +241,5 @@ FLL_D:
 #endif
 ASMEND:
 
-#if USE_IRQ
-	.section .bss
-	.align 4
-	.lcomm irq_stk, IRQ_STK_SIZE
-#endif
 	.end
 

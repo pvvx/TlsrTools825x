@@ -85,7 +85,7 @@ _attribute_ram_code_ int main (void) {
 	// Chip specific init
 	analog_write(0x82,0x64);	//areg_clk_setting
 	analog_write(0x52,0x80);
-	analog_write(0x0b,0x38);
+	analog_write(0x0b,0x38);	//Lowpower comparator:[3]=1 low power mode (current bias 50nA), [5:4]=3 Reference voltage scaling: 100%
 	analog_write(0x8c,0x02);
 	analog_write(0x02,0xa2);	//rega_vol_ldo_ctrl
 #if 0 		// GPIO wake up disable
