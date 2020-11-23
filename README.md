@@ -15,7 +15,7 @@ Alternative programmer for Telink TLSR825x on STM32F103C8T6.
 ![SCH](https://github.com/pvvx/TlsrTools825x/blob/master/docs/smp_activate1.gif)
 
 ## Activation step2:
-![SCH](https://github.com/pvvx/TlsrTools825x/blob/master/docs/smp_activate1.gif)
+![SCH](https://github.com/pvvx/TlsrTools825x/blob/master/docs/smp_activate2.gif)
 
 ## Read FullFlash:
 ![SCH](https://github.com/pvvx/TlsrTools825x/blob/master/docs/smp_ff_read.gif)
