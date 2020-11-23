@@ -497,16 +497,22 @@ static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 		  switch(Buf[1]) {
 			case 0: // Pull RST pin to GND 
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+				// PA7 -> SPI SDO Open Drain
+				GPIOA->CRL |= 0x03U<<GPIO_CRL_CNF7_Pos;
 			    spi_rxlen = 2;
 				break;
 			case 1: // Release pin RST
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+				// PA7 -> SPI SPI SDO PushPull
+				GPIOA->CRL = (GPIOA->CRL & (~(0x03U<<GPIO_CRL_CNF7_Pos))) | (0x02U<<GPIO_CRL_CNF7_Pos);
 			    spi_rxlen = 2;
 				break;
 			case 2: // Function 'Activate'
 			    if (spi_rxlen == 4) {
 					tst_cnt = (Buf[2]<<8) | Buf[3];
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+					// PA7 -> SPI SPI SDO PushPull
+					GPIOA->CRL = (GPIOA->CRL & (~(0x03U<<GPIO_CRL_CNF7_Pos))) | (0x02U<<GPIO_CRL_CNF7_Pos);
 					spi_rxlen = sw_cmd_len + 3;
 					spi_txlen = swbuf(spi_tx_buf, sw_cpu_stop, spi_rxlen);
 					spi_txlen_tst = swbuf(&spi_tx_buf[spi_txlen], sw_reg_clkdiv, spi_rxlen);
@@ -521,7 +527,7 @@ static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 				break;
 			case 4: // Get version && GPIO
 				Buf[2] = 0x00; // version hi
-				Buf[3] = 0x05; // version lo
+				Buf[3] = 0x06; // version lo
 				reg = GPIOA->IDR;
 				Buf[4] = reg >> 8;	// PA8..15
 				Buf[5] = reg;		// PA0..7

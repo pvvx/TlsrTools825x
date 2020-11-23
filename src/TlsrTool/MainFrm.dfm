@@ -297,7 +297,7 @@ object frmMain: TfrmMain
     ParentShowHint = False
     ShowHint = True
     TabOrder = 20
-    Text = '50'
+    Text = '70'
   end
   object EditSpeed: TEdit
     Left = 488
@@ -450,8 +450,8 @@ object frmMain: TfrmMain
     OnClick = ButtonFFReadClick
   end
   object ButtonBreak: TButton
-    Left = 504
-    Top = 288
+    Left = 496
+    Top = 312
     Width = 73
     Height = 21
     Hint = #1054#1089#1090#1072#1085#1086#1074#1080#1090#1100
@@ -934,6 +934,32 @@ object frmMain: TfrmMain
     ShowHint = True
     TabOrder = 42
     OnClick = ButtonRdSramClick
+  end
+  object ButtonCpuGo: TButton
+    Left = 496
+    Top = 288
+    Width = 65
+    Height = 21
+    Hint = 'CPU Go (0x0602 <- 0x08)'
+    Caption = 'CPU Go'
+    Enabled = False
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 43
+    OnClick = ButtonCpuGoClick
+  end
+  object ButtonCpuStall: TButton
+    Left = 496
+    Top = 264
+    Width = 65
+    Height = 21
+    Hint = 'CPU Stall (0x0602 <- 0x6)'
+    Caption = 'CPU Stall'
+    Enabled = False
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 44
+    OnClick = ButtonCpuStallClick
   end
   object SaveDialog: TSaveDialog
     Left = 576

@@ -24,7 +24,7 @@ const
   MCU_USB_ID_8266		= $5325;
   MCU_USB_ID_8267		= $5326;
   MCU_USB_ID_8269		= $5327;
-  MCU_USB_ID_8253		= $5562;
+  MCU_USB_ID_825X		= $5562;
 
   CHIP_REGS_SIZE = $8000;
   CHIP_SRAM_SIZE = $10000;
@@ -149,6 +149,8 @@ type
     ButtonARdAll: TButton;
     ButtonGetPC: TButton;
     ButtonRdSram: TButton;
+    ButtonCpuGo: TButton;
+    ButtonCpuStall: TButton;
     procedure ReScanComDevices;
     procedure ButtonReScanComDevicesClick(Sender: TObject);
 //    procedure CloseChkGPIO;
@@ -280,6 +282,8 @@ type
     procedure ButtonARdAllClick(Sender: TObject);
     procedure ButtonGetPCClick(Sender: TObject);
     procedure ButtonRdSramClick(Sender: TObject);
+    procedure ButtonCpuStallClick(Sender: TObject);
+    procedure ButtonCpuGoClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -579,6 +583,8 @@ begin
           ButtonAWrite.Enabled := True;
           ButtonARdAll.Enabled := True;
           ButtonGetPC.Enabled := True;
+          ButtonCpuStall.Enabled := True;
+          ButtonCpuGo.Enabled := True;
           flgReadGpioOn := True;
 end;
 
@@ -610,6 +616,8 @@ begin
      ButtonAWrite.Enabled := False;
      ButtonARdAll.Enabled := False;
      ButtonGetPC.Enabled := False;
+     ButtonCpuStall.Enabled := False;
+     ButtonCpuGo.Enabled := False;
      if flgComOpen then
           PurgeCom(PURGE_TXCLEAR or PURGE_RXCLEAR);
 end;
@@ -1512,8 +1520,8 @@ begin
           LabelDevID.Caption := 'SoC ID: 0x'+ IntToHex(SoC_ID, 2) + #13#10 + 'Chip: TLSR8267'
         else if SoC_ID = MCU_USB_ID_8269 then
           LabelDevID.Caption := 'SoC ID: 0x'+ IntToHex(SoC_ID, 2) + #13#10 + 'Chip: TLSR8269'
-        else if SoC_ID = MCU_USB_ID_8253 then
-          LabelDevID.Caption := 'SoC ID: 0x'+ IntToHex(SoC_ID, 2) + #13#10 + 'Chip: TLSR8253'
+        else if SoC_ID = MCU_USB_ID_825X then
+          LabelDevID.Caption := 'SoC ID: 0x'+ IntToHex(SoC_ID, 2) + #13#10 + 'Chip: TLSR825x'
         else
           LabelDevID.Caption := 'SoC ID: '+ IntToHex(SoC_ID, 2);
       end;
@@ -3210,6 +3218,26 @@ begin
       FileClose(bfile);
      end;
   MenuEnable;
+end;
+
+procedure TfrmMain.ButtonCpuStallClick(Sender: TObject);
+begin
+    MenuDisable;
+     if SwireWrite( $0602, $06, 1) then // CPU Stall
+       StatusBar.Panels[1].Text:='CPU Stall.'
+     else
+       StatusBar.Panels[1].Text:='Ошибки на swire!';
+    MenuEnable;
+end;
+
+procedure TfrmMain.ButtonCpuGoClick(Sender: TObject);
+begin
+    MenuDisable;
+     if SwireWrite( $0602, $08, 1) then // CPU Go
+       StatusBar.Panels[1].Text:='CPU Go.'
+     else
+       StatusBar.Panels[1].Text:='Ошибки на swire!';
+    MenuEnable;
 end;
 
 end.
