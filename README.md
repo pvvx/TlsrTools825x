@@ -1,11 +1,11 @@
-# TlsrTools
+# TlsrTools (TLSR825x)
 Alternative programmer for Telink TLSR825x on STM32F103C8T6.
 
-[Прошивка для STM32F103C8T6](https://github.com/pvvx/TlsrTools/blob/master/STM32F103)
+[Прошивка для STM32F103C8T6](https://github.com/pvvx/TlsrTools825x/raw/refs/heads/master/bin/USB2Swire-STM32F103C8-v06.hex))
 
-[Программа для PC под Windows](https://github.com/pvvx/TlsrTools/blob/master/bin)
+[Программа для PC под Windows](https://github.com/pvvx/TlsrTools825x/tree/master/bin)
 
-[See](https://github.com/pvvx/TlsrTools)
+[TLSR826x - See](https://github.com/pvvx/TlsrTools)
 
 # Example: Reading FullFlash from Xiaomi LYWSD03MMC
 ## Connecting to a thermometer:
